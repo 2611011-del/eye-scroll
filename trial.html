@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Eye Scroll — 체험하기</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav>
+    <div class="logo">👁️ Eye Scroll</div>
+    <div class="menu">
+        <a href="#about">소개</a>
+        <a href="#tech">기술</a>
+        <a href="#game">체험하기</a>
+        <div class="mode-tabs">
+            <a href="trial.html" class="active">체험</a>
+            <a href="install.html">실행</a>
+        </div>
+    </div>
+</nav>
+
+<section class="hero">
+    <div class="hero-content">
+        <span class="badge">웹캠으로 바로 체험</span>
+        <h1>Eye Scroll</h1>
+        <h2>고개를 돌리는 만큼<br>화면을 제어하는 헤드 트래커</h2>
+        <p>
+            카메라 앞에서 고개를 좌우로 움직이는 것만으로 마우스처럼
+            화면을 조작할 수 있는 프로젝트입니다. 눈을 감으면 클릭도 할 수
+            있어요. 설치 없이 이 페이지에서 바로 카메라로 체험해볼 수 있어요.
+        </p>
+        <a href="#game" class="main-button">지금 체험하기</a>
+        <a href="install.html" class="ghost-button">앱으로 실제 실행하기</a>
+    </div>
+</section>
+
+<section id="about">
+    <div class="section-title">
+        <span>ABOUT</span>
+        <h2>프로젝트 소개</h2>
+        <p>얼굴(코 끝) 위치를 실시간으로 추적해 입력 장치로 바꿉니다</p>
+    </div>
+    <div class="about-box">
+        <div class="about-text">
+            <h3>손 없이도 화면을 조작하다</h3>
+            <p>
+                Eye Scroll은 웹캠 영상에서 얼굴의 위치, 특히
+                <strong>코 끝의 움직임</strong>을 실시간으로 추적하는
+                프로젝트입니다. 처음 3초간 정면을 바라보면 자동으로
+                기준점을 잡고, 그 기준에서 고개를 좌우/상하로 얼마나
+                움직였는지에 따라 마우스 커서가 이동합니다.
+            </p>
+            <p>
+                눈을 잠깐 감으면 클릭·드래그가 되고, 말을 하면 문장이
+                자동으로 입력되어 <strong>손을 쓰기 어려운 환경에서도
+                컴퓨터를 제어</strong>할 수 있도록 하는 것이 목표입니다.
+            </p>
+        </div>
+        <div class="about-point">
+            <div class="point">
+                <strong>실시간</strong>
+                <span>초당 수십 프레임으로 얼굴 위치를 추적합니다.</span>
+            </div>
+            <div class="point">
+                <strong>비접촉</strong>
+                <span>키보드나 마우스 없이 카메라만으로 동작합니다.</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="tech" class="gray-section">
+    <div class="section-title">
+        <span>TECH STACK</span>
+        <h2>사용 기술</h2>
+        <p>세 가지 라이브러리가 각자의 역할을 맡아 하나의 파이프라인을 이룹니다</p>
+    </div>
+    <div class="tech-grid">
+        <div class="tech-card">
+            <div class="icon">📷</div>
+            <h3>OpenCV</h3>
+            <p>카메라 영상을 받아오고, 프레임 단위로 영상 데이터를 처리합니다.</p>
+            <span class="tag">영상 입력</span>
+        </div>
+        <div class="tech-card">
+            <div class="icon">🧭</div>
+            <h3>MediaPipe</h3>
+            <p>얼굴의 위치를 분석해 코 끝(머리) 움직임과 눈 감김을 추적합니다.</p>
+            <span class="tag">얼굴·머리 추적</span>
+        </div>
+        <div class="tech-card">
+            <div class="icon">🖱️</div>
+            <h3>PyAutoGUI</h3>
+            <p>추적된 머리 움직임에 따라 실제 마우스와 클릭·드래그를 제어합니다.</p>
+            <span class="tag">입력 제어</span>
+        </div>
+        <div class="tech-card">
+            <div class="icon">🌐</div>
+            <h3>MediaPipe Face Mesh (Web)</h3>
+            <p>브라우저에서는 같은 방식의 웹용 모델로 카메라 체험을 제공합니다.</p>
+            <span class="tag">브라우저 체험</span>
+        </div>
+        <div class="tech-card">
+            <div class="icon">🎙️</div>
+            <h3>SpeechRecognition</h3>
+            <p>마이크 음성을 텍스트로 바꿔 포커스된 입력창에 자동으로 붙여넣습니다.</p>
+            <span class="tag">음성 입력</span>
+        </div>
+    </div>
+</section>
+
+<section>
+    <div class="section-title">
+        <span>HOW IT WORKS</span>
+        <h2>작동 원리</h2>
+        <p>웹캠 영상이 마우스 입력으로 바뀌기까지의 흐름</p>
+    </div>
+    <div class="process">
+        <div class="process-card">
+            <div>📷</div>
+            <strong>웹캠</strong>
+            <small>영상 입력</small>
+        </div>
+        <div class="arrow">→</div>
+        <div class="process-card">
+            <div>🧩</div>
+            <strong>OpenCV</strong>
+            <small>영상 처리</small>
+        </div>
+        <div class="arrow">→</div>
+        <div class="process-card">
+            <div>🧭</div>
+            <strong>MediaPipe</strong>
+            <small>머리 위치 분석</small>
+        </div>
+        <div class="arrow">→</div>
+        <div class="process-card">
+            <div>🖱️</div>
+            <strong>PyAutoGUI</strong>
+            <small>커서 제어</small>
+        </div>
+        <div class="arrow">→</div>
+        <div class="process-card">
+            <div>📜</div>
+            <strong>스크롤</strong>
+            <small>화면 이동</small>
+        </div>
+    </div>
+</section>
+
+<section id="game" class="game-section">
+    <div class="section-title">
+        <span>TRY IT NOW</span>
+        <h2>웹캠으로 미니게임 체험하기</h2>
+        <p>설치 없이, 이 브라우저에서 고개를 움직여 바구니로 별을 잡아보세요</p>
+    </div>
+    <div class="game-layout">
+        <div class="game-stage">
+            <canvas id="gameCanvas" width="640" height="480"></canvas>
+            <div class="game-video-wrap">
+                <video id="inputVideo" playsinline muted></video>
+            </div>
+            <div class="game-score" id="scoreLabel">점수: 0</div>
+            <div class="game-overlay" id="startOverlay">
+                <div>
+                    <button class="main-button" id="startCameraBtn">카메라로 체험 시작</button>
+                    <p id="overlayMessage">
+                        카메라 접근을 허용하면, 얼굴을 인식해 코 끝(머리)
+                        위치를 분석합니다. 영상은 저장되거나 서버로 전송되지
+                        않고 이 브라우저 안에서만 처리됩니다.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="game-panel">
+            <h3>체험 방법</h3>
+            <ol>
+                <li>버튼을 눌러 카메라 권한을 허용해요.</li>
+                <li>처음 2초는 정면을 바라봐 기준점을 잡아요.</li>
+                <li>이후 고개를 좌우로 움직여 바구니를 옮겨요.</li>
+                <li>떨어지는 별을 바구니로 받으면 점수가 올라가요.</li>
+            </ol>
+            <div class="game-controls">
+                <button class="toggle-chip" id="flipXBtn">좌우 반응 반대로</button>
+                <button class="toggle-chip" id="keyboardBtn">키보드로도 조작(←/→)</button>
+            </div>
+            <p class="game-status">
+                추적 상태: <strong id="trackStatus">대기 중</strong>
+            </p>
+        </div>
+    </div>
+</section>
+
+<section>
+    <div class="section-title">
+        <span>WHY</span>
+        <h2>기대 효과</h2>
+        <p>고개 움직임과 눈 깜빡임만으로도 충분히 화면을 다룰 수 있습니다</p>
+    </div>
+    <div class="effect-grid">
+        <div class="effect-card">
+            <div>🖐️</div>
+            <h3>손이 자유로워요</h3>
+            <p>키보드나 마우스를 잡지 않고도 화면을 넘길 수 있습니다.</p>
+        </div>
+        <div class="effect-card">
+            <div>♿</div>
+            <h3>접근성 향상</h3>
+            <p>손을 쓰기 어려운 사용자도 컴퓨터를 다룰 수 있게 돕습니다.</p>
+        </div>
+        <div class="effect-card">
+            <div>📖</div>
+            <h3>긴 문서 읽기 편리</h3>
+            <p>독서, 논문 검토처럼 손이 다른 일을 할 때도 스크롤이 가능합니다.</p>
+        </div>
+    </div>
+</section>
+
+<footer>
+    <h3>Eye Scroll</h3>
+    <p>고개의 움직임으로 웹페이지를 제어하다</p>
+    <p class="copyright">© 2026 Eye Scroll Project</p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js" crossorigin="anonymous"></script>
+<script src="game.js"></script>
+</body>
+</html>
