@@ -1,12 +1,10 @@
 /*
  * Eye Scroll - 브라우저 체험용 미니게임
- * MediaPipe Face Mesh로 "코 끝(nose tip)" 위치를 추적해,
- * 실제 프로그램처럼 고개를 좌우로 돌리는 움직임으로
- * 화면 하단 바구니를 옮겨 떨어지는 별을 잡는 게임입니다.
+ * MediaPipe Face Mesh(iris 옵션)로 눈동자 위치를 추정해
+ * 화면 하단 바구니를 좌우로 움직여 떨어지는 별을 잡는 게임입니다.
  *
- * 실제 데스크톱 프로그램(OpenCV+MediaPipe+PyAutoGUI)과 같은 방식으로,
- * 처음 2초간 정면을 보면 그 위치를 기준점으로 자동 보정(캘리브레이션)한 뒤
- * 그 기준에서 고개가 얼마나 움직였는지로 좌우 위치를 계산합니다.
+ * 정확한 실제 프로그램(OpenCV+MediaPipe+PyAutoGUI, 데스크톱)의 데모 버전이며,
+ * 여기서는 마우스를 직접 움직이는 대신 게임 속 바구니를 움직입니다.
  */
 
 const canvas = document.getElementById('gameCanvas');
@@ -32,10 +30,10 @@ let running = false;
 let lastSpawn = 0;
 let spawnInterval = 1100;
 
-// ---- 고개(머리) 위치 제어 상태 ----
-let headOffset = 0;      // -1(왼쪽) ~ 1(오른쪽), 보정된 값
-let smoothedNoseX = 0.5; // 코 끝 x좌표의 스무딩 값
-let baseline = 0.5;      // 정면을 바라볼 때의 기준값(캘리브레이션 결과)
+// ---- 시선(홍채) 제어 상태 ----
+let gazeOffset = 0;      // -1(왼쪽) ~ 1(오른쪽), 보정된 값
+let smoothedRatio = 0.5; // 원본 홍채 좌우 비율의 스무딩 값
+let baseline = 0.5;      // 정면을 바라볼 때의 기준값
 let calibrating = false;
 let calibSamples = [];
 let flipX = false;
@@ -43,11 +41,26 @@ let keyboardEnabled = true;
 let keyLeft = false;
 let keyRight = false;
 
-// ---- 코 끝(nose tip) 위치 계산 ----
-// 실제 프로그램(nosecast.py)과 동일하게 landmark[1](코 끝)의 위치를 기준으로,
-// 정면 기준점에서 얼마나 좌우로 움직였는지를 계산합니다.
-const NOSE_IDX = 1;
-const HEAD_RANGE_X = 0.045; // 이 정도 고개 움직임이면 화면 끝까지 이동 (실제 프로그램의 range_x와 비슷한 값)
+// ---- 눈동자(홍채) 비율 계산 ----
+// RIGHT_IRIS: 눈동자 둘레 4점, 오른쪽 눈 좌우 경계: 33(바깥쪽) / 133(안쪽)
+const IRIS_IDX = [469, 470, 471, 472];
+const EYE_LEFT_IDX = 33;
+const EYE_RIGHT_IDX = 133;
+
+function computeGazeRatio(landmarks) {
+    let ix = 0;
+    for (const i of IRIS_IDX) ix += landmarks[i].x;
+    ix /= IRIS_IDX.length;
+
+    const xa = landmarks[EYE_LEFT_IDX].x;
+    const xb = landmarks[EYE_RIGHT_IDX].x;
+    const lo = Math.min(xa, xb);
+    const hi = Math.max(xa, xb);
+    if (hi - lo < 1e-5) return null;
+
+    let ratio = (ix - lo) / (hi - lo);
+    return Math.min(1, Math.max(0, ratio));
+}
 
 function onFaceResults(results) {
     if (!results.multiFaceLandmarks || results.multiFaceLandmarks.length === 0) {
@@ -56,19 +69,20 @@ function onFaceResults(results) {
     }
 
     const landmarks = results.multiFaceLandmarks[0];
-    const noseX = landmarks[NOSE_IDX].x;
+    const ratio = computeGazeRatio(landmarks);
+    if (ratio === null) return;
 
-    smoothedNoseX = smoothedNoseX * 0.7 + noseX * 0.3;
+    smoothedRatio = smoothedRatio * 0.7 + ratio * 0.3;
 
     if (calibrating) {
-        calibSamples.push(smoothedNoseX);
-        trackStatus.textContent = '정면을 봐주세요 (보정 중)';
+        calibSamples.push(smoothedRatio);
+        trackStatus.textContent = '가운데를 봐주세요 (보정 중)';
         return;
     }
 
-    let offset = (smoothedNoseX - baseline) / HEAD_RANGE_X;
+    let offset = (smoothedRatio - baseline) * 3.2; // 민감도
     if (flipX) offset *= -1;
-    headOffset = Math.min(1, Math.max(-1, offset));
+    gazeOffset = Math.min(1, Math.max(-1, offset));
 
     trackStatus.textContent = '추적 중';
 }
@@ -195,7 +209,7 @@ function loop(now) {
         if (keyRight) keyboardDelta += 6;
     }
 
-    basket.targetX = W / 2 + headOffset * (W / 2 - basket.width / 2);
+    basket.targetX = W / 2 + gazeOffset * (W / 2 - basket.width / 2);
     basket.x += (basket.targetX - basket.x) * 0.18 + keyboardDelta;
     basket.x = Math.min(W - basket.width / 2, Math.max(basket.width / 2, basket.x));
 

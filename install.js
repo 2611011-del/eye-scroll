@@ -1,11 +1,11 @@
 // 다운로드 버튼: 별도의 zip 파일을 서버/폴더에서 찾지 않고,
 // 클릭하는 순간 브라우저 안에서 zip을 직접 만들어 내려줍니다.
-// -> "파일이 없다"는 오류가 나지 않도록 실제 프로그램 파일 내용을 이 스크립트 안에 담아둡니다.
+// -> "파일이 없다"는 오류가 나지 않도록 실제 파일 내용을 이 스크립트 안에 담아둡니다.
 
 const downloadBtn = document.getElementById('downloadBtn');
 const downloadHint = document.getElementById('downloadHint');
 
-const NOSECAST_PY = `import math
+const MAIN_PY = `import math
 import platform
 import threading
 import time
@@ -45,12 +45,6 @@ is_pressed = False
 blink_frames = 0
 BLINK_THRESHOLD = 3
 
-# --- 음성 스크롤 변수 ---
-SCROLL_STEP = 600           # "스크롤 업/다운" 한 번에 스크롤되는 양
-last_scroll_action = ''
-last_scroll_action_time = 0.0
-SCROLL_DISPLAY_DURATION = 1.2  # 화면에 상태 문구를 보여줄 시간(초)
-
 # --- 캘리브레이션 변수 ---
 is_calibrated = False
 calibration_start_time = time.time()
@@ -58,7 +52,7 @@ calib_nose_x_list = []
 calib_nose_y_list = []
 
 range_x = 0.05
-range_y = 0.025
+range_y = 0.04
 
 min_x, max_x = 0.0, 1.0
 min_y, max_y = 0.0, 1.0
@@ -73,10 +67,8 @@ PASTE_KEY = 'command' if platform.system() == 'Darwin' else 'ctrl'
 
 
 def listen_voice_background():
-  """웹 입력창에 한글이 깨지지 않고 들어가도록 클립보드 붙여넣기 방식 적용.
-  단, '스크롤 업' / '스크롤 다운'이라고 말하면 텍스트를 붙여넣는 대신 스크롤을 실행함."""
+  """웹 입력창에 한글이 깨지지 않고 들어가도록 클립보드 붙여넣기 방식 적용"""
   global last_spoken_text, is_listening_active
-  global last_scroll_action, last_scroll_action_time
 
   with sr.Microphone() as source:
     recognizer.adjust_for_ambient_noise(source, duration=1)
@@ -91,22 +83,11 @@ def listen_voice_background():
           print(f'[인식된 텍스트]: {text}')
           last_spoken_text = text
 
-          if '스크롤' in text and any(k in text for k in ['다운', '아래', '밑']):
-            # 스크롤 다운 명령
-            pyautogui.scroll(-SCROLL_STEP)
-            last_scroll_action = 'SCROLL DOWN (voice)'
-            last_scroll_action_time = time.time()
+          # 1. 텍스트를 클립보드에 복사 (공백 포함)
+          pyperclip.copy(text + ' ')
 
-          elif '스크롤' in text and any(k in text for k in ['업', '위']):
-            # 스크롤 업 명령
-            pyautogui.scroll(SCROLL_STEP)
-            last_scroll_action = 'SCROLL UP (voice)'
-            last_scroll_action_time = time.time()
-
-          else:
-            # 일반 텍스트: 클립보드 복사 후 붙여넣기
-            pyperclip.copy(text + ' ')
-            pyautogui.hotkey(PASTE_KEY, 'v')
+          # 2. 현재 포커스된 웹 입력창에 붙여넣기 실행
+          pyautogui.hotkey(PASTE_KEY, 'v')
 
       except sr.WaitTimeoutError:
         pass
@@ -192,19 +173,7 @@ while cap.isOpened():
         pyautogui.moveTo(curr_x, curr_y)
         prev_x, prev_y = curr_x, curr_y
 
-      # --- [3] 음성 스크롤 상태 표시 (실제 스크롤은 음성 인식 스레드에서 실행됨) ---
-      if last_scroll_action and time.time() - last_scroll_action_time < SCROLL_DISPLAY_DURATION:
-        cv2.putText(
-            frame,
-            last_scroll_action,
-            (50, 140),
-            cv2.FONT_HERSHEY_SIMPLEX,
-            0.7,
-            (255, 128, 0),
-            2,
-        )
-
-      # --- [4] 눈 감기 감지 ---
+      # --- [3] 눈 감기 감지 ---
       vertical_dist = get_distance(landmarks[159], landmarks[145])
       horizontal_dist = get_distance(landmarks[33], landmarks[133])
       ear = vertical_dist / (horizontal_dist + 1e-6)
@@ -265,27 +234,6 @@ cap.release()
 cv2.destroyAllWindows()
 `;
 
-const NOSECAST_BAT = `@echo off
-cd /d "%~dp0"
-
-py -3.11 --version >nul 2>&1
-if %errorlevel%==0 (
-    py -3.11 nosecast.py
-    goto end
-)
-
-py -3.10 --version >nul 2>&1
-if %errorlevel%==0 (
-    py -3.10 nosecast.py
-    goto end
-)
-
-echo Python 3.10 또는 3.11을 찾을 수 없습니다. 설치되어 있는지 확인해주세요.
-
-:end
-pause
-`;
-
 const REQUIREMENTS_TXT = `opencv-python
 mediapipe
 pyautogui
@@ -296,27 +244,21 @@ PyAudio
 
 const README_TXT = `Eye Scroll 실행 방법
 
-[Windows에서 가장 쉬운 방법]
-1) 압축을 푼 폴더에서 install.bat (또는 requirements 설치 후) 아래 절차를 따라주세요.
-   - 먼저 터미널(명령 프롬프트)에서 이 폴더로 이동한 뒤 아래 명령어로 필요한 패키지를 설치하세요.
-     pip install -r requirements.txt
+1) 이 폴더에서 터미널을 열고 아래 명령어로 필요한 패키지를 설치하세요.
+   pip install -r requirements.txt
 
-     * 마이크 음성 인식을 쓰려면 PyAudio 설치가 필요해요.
-       설치가 안 되면 아래처럼 시도해보세요.
-       - Windows: pip install pipwin  ->  pipwin install pyaudio
-       - macOS:   brew install portaudio  ->  pip install pyaudio
+   * 마이크 음성 인식을 쓰려면 PyAudio 설치가 필요해요.
+     설치가 안 되면 아래처럼 시도해보세요.
+     - Windows: pip install pipwin  ->  pipwin install pyaudio
+     - macOS:   brew install portaudio  ->  pip install pyaudio
 
-2) 패키지 설치가 끝나면 nosecast_실행.bat 파일을 더블클릭하면 프로그램이 실행됩니다.
-   (bat 파일은 Python 3.11 또는 3.10을 자동으로 찾아 nosecast.py를 실행해요.)
-
-   또는 터미널에서 직접 아래 명령어로 실행해도 됩니다.
-   python nosecast.py
+2) 아래 명령어로 프로그램을 실행하세요.
+   python main.py
 
 3) 실행 후 3초간 화면 중앙을 정면으로 바라보면 자동으로 캘리브레이션됩니다.
    - 고개(코 위치) 움직임으로 마우스 커서가 이동해요.
    - 눈을 잠깐 감으면 클릭/드래그가 시작되고, 뜨면 놓여요.
-   - 마이크에 "스크롤 업" / "스크롤 다운"이라고 말하면 화면이 스크롤돼요.
-   - 그 외의 말은 인식된 문장이 현재 포커스된 입력창에 자동으로 붙여넣기 돼요.
+   - 마이크에 말하면 인식된 문장이 현재 포커스된 입력창에 자동으로 붙여넣기 돼요.
    - q 또는 Esc 키를 누르면 종료됩니다.
 `;
 
@@ -330,8 +272,7 @@ downloadBtn.addEventListener('click', async () => {
         }
 
         const zip = new JSZip();
-        zip.file('nosecast.py', NOSECAST_PY);
-        zip.file('nosecast_실행.bat', NOSECAST_BAT);
+        zip.file('main.py', MAIN_PY);
         zip.file('requirements.txt', REQUIREMENTS_TXT);
         zip.file('README.txt', README_TXT);
 

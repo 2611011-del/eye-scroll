@@ -25,12 +25,11 @@
     <div class="hero-content">
         <span class="badge">내 컴퓨터에서 실제로 실행</span>
         <h1>Eye Scroll 설치하기</h1>
-        <h2>고개 움직임으로 실제 마우스를 움직이는<br>데스크톱 프로그램 실행</h2>
+        <h2>눈동자로 실제 마우스를 움직이는<br>데스크톱 프로그램 실행</h2>
         <p>
             브라우저 체험은 웹캠으로 미니게임을 조작해보는 데모입니다.
-            실제로 고개 움직임으로 내 컴퓨터의 마우스 커서를 움직이고,
-            눈을 감아 클릭하거나 말로 문장을 입력하려면 아래 프로그램을
-            내려받아 실행해야 해요.
+            실제로 눈동자로 내 컴퓨터의 마우스 커서와 스크롤을 제어하려면
+            아래 프로그램을 내려받아 실행해야 해요.
         </p>
         <a href="#download" class="main-button">다운로드하러 가기</a>
         <a href="trial.html" class="ghost-button">먼저 체험해보기</a>
@@ -53,7 +52,7 @@
         <div class="tech-card">
             <div class="icon">📷</div>
             <h3>웹캠</h3>
-            <p>얼굴과 눈을 인식할 수 있는 카메라가 필요합니다.</p>
+            <p>얼굴과 눈동자를 인식할 수 있는 카메라가 필요합니다.</p>
             <span class="tag">필수</span>
         </div>
         <div class="tech-card">
@@ -110,15 +109,15 @@
             <div class="step-num">4</div>
             <div>
                 <h3>프로그램 실행</h3>
-                <p>Windows에서는 <code>nosecast_실행.bat</code> 파일을 더블클릭하면 바로 실행돼요. 또는 터미널에서 아래 명령어를 입력하고, 카메라 권한 요청이 뜨면 허용해주세요.</p>
-                <code>python nosecast.py</code>
+                <p>아래 명령어로 프로그램을 실행하고, 카메라 권한 요청이 뜨면 허용해주세요.</p>
+                <code>python main.py</code>
             </div>
         </div>
         <div class="step-item">
             <div class="step-num">5</div>
             <div>
                 <h3>제어 시작</h3>
-                <p>실행 후 3초간 화면 중앙을 정면으로 바라보면 자동으로 캘리브레이션돼요. 이후 고개(코 위치) 움직임으로 커서가 움직이고, 눈을 잠깐 감으면 클릭/드래그가 실행돼요. "스크롤 업" / "스크롤 다운"이라고 말하면 화면이 스크롤되고, 그 외의 말은 문장으로 자동 입력돼요.</p>
+                <p>실행 후 3초간 화면 중앙을 정면으로 바라보면 자동으로 캘리브레이션돼요. 이후 고개(코 위치) 움직임으로 커서가 움직이고, 눈을 잠깐 감으면 클릭/드래그, 말을 하면 문장이 자동으로 입력돼요.</p>
             </div>
         </div>
     </div>
@@ -138,15 +137,15 @@
         <button class="main-button" id="downloadBtn">다운로드</button>
     </div>
     <p class="download-note">
-        ※ 버튼을 누르면 nosecast.py, nosecast_실행.bat, requirements.txt, README.txt가
-        담긴 zip 파일이 그 자리에서 만들어져 내려받아집니다. 별도 파일을 찾지
+        ※ 버튼을 누르면 main.py, requirements.txt, README.txt가 담긴
+        zip 파일이 그 자리에서 만들어져 내려받아집니다. 별도 파일을 찾지
         않기 때문에 "파일이 없다"는 오류 없이 항상 내려받을 수 있어요.
     </p>
 </section>
 
 <footer>
     <h3>Eye Scroll</h3>
-    <p>고개의 움직임으로 실제 화면을 제어하다</p>
+    <p>눈동자의 움직임으로 실제 화면을 제어하다</p>
     <p class="copyright">© 2026 Eye Scroll Project</p>
 </footer>
 
